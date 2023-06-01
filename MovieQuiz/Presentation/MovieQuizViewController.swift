@@ -45,6 +45,7 @@ final class MovieQuizViewController: UIViewController {
         //булевая переменная которая содержит ТРУ если ответ сошелся
         let isCorrectAnswer = currentQuestion.correctAnswer == false
         showAnswerResult(isCorrect: isCorrectAnswer)
+        noButton.isUserInteractionEnabled = false
     }
     
     @IBAction private func yesButtonClicked(_ sender: Any) {
@@ -52,6 +53,7 @@ final class MovieQuizViewController: UIViewController {
         let currentQuestion = questions[currentQuestionIndex]
         let isCorrectAnswer = currentQuestion.correctAnswer == true
         showAnswerResult(isCorrect: isCorrectAnswer)
+        yesButton.isUserInteractionEnabled = false
     }
     
     /// метод конвертации, который принимает моковый вопрос и возвращает вью модель для экрана вопроса
@@ -87,6 +89,8 @@ final class MovieQuizViewController: UIViewController {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             // который мы хотим вызвать через 1 секунду
             self.showNextQuestionOrResult()
+            self.noButton.isUserInteractionEnabled = true
+            self.yesButton.isUserInteractionEnabled = true
         }
     }
     
