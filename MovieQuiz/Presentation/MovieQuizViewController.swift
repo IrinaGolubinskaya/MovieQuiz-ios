@@ -15,6 +15,10 @@ final class MovieQuizViewController: UIViewController {
     ///переменная со счетчиком правильных ответов, начальное значение закономерно =0
     private var correctAnswers = 0
     
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        .lightContent
+    }
+    
     /// массив вопросов
     private let questions: [QuizQuestion] = [
         QuizQuestion(image: "The Godfather", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: true),
@@ -46,6 +50,7 @@ final class MovieQuizViewController: UIViewController {
         let isCorrectAnswer = currentQuestion.correctAnswer == false
         showAnswerResult(isCorrect: isCorrectAnswer)
         noButton.isUserInteractionEnabled = false
+        yesButton.isUserInteractionEnabled = false
     }
     
     @IBAction private func yesButtonClicked(_ sender: Any) {
@@ -54,6 +59,7 @@ final class MovieQuizViewController: UIViewController {
         let isCorrectAnswer = currentQuestion.correctAnswer == true
         showAnswerResult(isCorrect: isCorrectAnswer)
         yesButton.isUserInteractionEnabled = false
+        noButton.isUserInteractionEnabled = false
     }
     
     /// метод конвертации, который принимает моковый вопрос и возвращает вью модель для экрана вопроса
