@@ -34,6 +34,72 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         questionFactory = QuestionFactory(delegate: self)
         questionFactory?.requestNextQuestion()
         imageView.layer.cornerRadius = 20
+        
+        
+        var documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let fileName = "inception.json"
+        documentsURL.appendPathComponent(fileName)
+        if let jsonString = try? String(contentsOf: documentsURL) {
+           // print(getMovie(from: jsonString))
+            let movie = getMovie(from: jsonString)
+            dump(movie)
+        }
+       
+   }
+    
+    func getMovie(from jsonString: String) -> Movie? {
+        guard let data = jsonString.data(using: .utf8) else { //переводим json в двоичный код
+            return nil //если json пустой, возвращаем НИЛ так как функция должна что-то возвращать
+        }
+        do {
+            let jsonDict =  try JSONSerialization.jsonObject(with: data) as? [String: Any]
+            // сохраняем в переменную "jsonDict" значение json-а в виде словаря с опциональным значением
+            guard let actorList = jsonDict?["actorList"] as? [Any] else {
+                return nil }
+            // сохраняем в переменную "actorList"   элемент "actorList" из словаря "jsonDict" как массив Any. так как словарь опциональный, раскрываем переменную через GUARDи возвращаем НИЛ, если словаря нет. Массив Получается тоже опциональным, так как его может и не быть в json-е.
+            var actorArray: [Actor] = []
+            //создаём пустой массив, в котором будут Структуры Actor
+            for actor in actorList {
+                //проходим по каждому элементу массива
+                if let actor = actor as? [String: String] {
+                    //для каждого ключа из словаря достаём значение:
+                    guard let id = actor["id"],
+                    let image = actor["image"],
+                    let name = actor["name"],
+                    let asCharacter = actor["asCharacter"] else {
+                        return nil
+                    }
+                    let actorModel = Actor(id: id, image: image, name: name, asCharacter: asCharacter)
+                    actorArray.append(actorModel)
+                }
+            }
+            guard let id = jsonDict?["id"] as? String else {
+                return nil
+            }
+                   guard let title = jsonDict?["title"] as? String else {
+                       return nil
+                   }
+                   guard let year = jsonDict?["year"] as? String else {
+                       return nil
+                   }
+                   guard let image = jsonDict?["image"] as? String else {
+                       return nil
+                   }
+                   guard let releaseDate = jsonDict?["releaseDate"] as? String else {
+                       return nil
+                   }
+                   guard let runtimeMins = jsonDict?["runtimeMins"] as? String else {
+                       return nil
+                   }
+                   guard let directors = jsonDict?["directors"] as? String else {
+                 return nil} 
+            let movieModel = Movie(id: id, title: title, year: year, image: image, releaseDate: releaseDate, runtimeMins: runtimeMins, directors: directors, actorList: actorArray)
+            return movieModel
+                   
+        } catch {
+            print("Failed to parse: \(jsonString)")
+            return nil
+        }
     }
     
     // MARK: - QuestionFactoryDelegate
@@ -169,6 +235,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     }
     
 }
+
 /*
  Mock-данные
  
@@ -232,3 +299,4 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
  Вопрос: Рейтинг этого фильма больше чем 6?
  Ответ: НЕТ
  */
+
