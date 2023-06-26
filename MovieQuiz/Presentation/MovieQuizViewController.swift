@@ -37,24 +37,23 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         
         
         var documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        let fileName = "inception.json"
+        let fileName = "top250MoviesIMDB.json"
         documentsURL.appendPathComponent(fileName)
         print(documentsURL)
         if let jsonString = try? String(contentsOf: documentsURL) {
-            print(getMovie(from: jsonString))
-            let movie = getMovie(from: jsonString)
-            //dump(movie)
+            let top = getTop(from: jsonString)
+            dump(top)
         }
        
    }
     
-    func getMovie(from jsonString: String) -> Movie? {
+    func getTop(from jsonString: String) -> Top? {
         guard let data = jsonString.data(using: .utf8) else { //переводим json в двоичный код
             return nil //если json пустой, возвращаем НИЛ так как функция должна что-то возвращать
         }
         do {
-            let movie = try JSONDecoder().decode(Movie.self, from: data)
-            return movie
+            let top = try JSONDecoder().decode(Top.self, from: data)
+            return top
         } catch {
             print("Failed to parse: \(error.localizedDescription)")
             

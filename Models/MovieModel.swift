@@ -8,55 +8,69 @@
 import Foundation
 
 struct Movie: Codable {
-    let id: String
-    let title: String
-    let year: Int
-    let image: String
-    let releaseDate: String
-    let runtimeMins: Int
-    let directors: String
-    let actorList: [Actor]
+        let id : String
+        let rank: Int
+        let title: String
+        let fullTitle: String
+        let year: Int
+        let image: String
+        let crew: String
+        let imDbRating : Double
+        let imDbRatingCount: Int
     
     enum CodingKeys : CodingKey {
         case id
+        case rank
         case title
+        case fullTitle
         case year
         case image
-        case releaseDate
-        case runtimeMins
-        case directors
-        case actorList
+        case crew
+        case imDbRating
+        case imDbRatingCount
     }
     
     enum ParseError: Error {
         case yearFailure
-        case runtimeMinsFailure
+        case rankFailure
+        case imDbRatingFailure
+        case imDbRatingCount
     }
     init(from decoder: Decoder) throws {
         let container =  try decoder.container(keyedBy: CodingKeys.self)
         
         id = try container.decode(String.self, forKey: .id)
         
+        let rank = try container.decode(String.self, forKey: .rank)
+        guard let rankValue = Int(rank) else {
+            throw ParseError.rankFailure
+        }
+        self.rank = rankValue
+        
         title = try container.decode(String.self, forKey: .title)
         
+        fullTitle = try container.decode(String.self, forKey: .fullTitle)
+        
         let year = try container.decode(String.self, forKey: .year)
-        guard let yearValue = Int(year) else {
+        guard let yeraValue = Int(year) else {
             throw ParseError.yearFailure
         }
-        self.year = yearValue
+        self.year = yeraValue
         
         image = try container.decode(String.self, forKey: .image)
         
-        releaseDate = try container.decode(String.self, forKey: .releaseDate)
+        crew = try container.decode(String.self, forKey: .crew)
         
-        let runtimeMins = try container.decode(String.self, forKey: .runtimeMins)
-        guard let runtimeMins = Int(runtimeMins) else {
-            throw ParseError.runtimeMinsFailure
+        let imDbRating = try container.decode(String.self, forKey: .imDbRating)
+        guard let imDbRatingValue = Double(imDbRating) else {
+            throw ParseError.imDbRatingFailure
         }
-        self.runtimeMins = runtimeMins
+        self.imDbRating = imDbRatingValue
         
-        directors = try container.decode(String.self, forKey: .directors)
-        
-        actorList = try container.decode([Actor].self, forKey: .actorList)
+        let imDbRatingCount = try container.decode(String.self, forKey: .imDbRatingCount)
+        guard let imDbRatingCountValue = Int(imDbRatingCount) else {
+            throw ParseError.imDbRatingFailure
+        }
+        self.imDbRatingCount = imDbRatingCountValue
     }
 }
