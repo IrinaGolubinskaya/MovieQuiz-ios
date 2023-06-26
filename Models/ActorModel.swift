@@ -7,7 +7,6 @@
 
 import Foundation
 
-
 struct Actor: Codable {
     let id: String
     let image: String
