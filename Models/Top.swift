@@ -6,7 +6,7 @@
 //
 
 import Foundation
-
+//структура модели json-a
 struct Top: Codable {
     let items: [Movie]
 }

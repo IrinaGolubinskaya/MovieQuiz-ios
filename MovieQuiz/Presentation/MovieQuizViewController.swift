@@ -18,15 +18,23 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     ///общее количество вопросов для квиза
     private let questionsAmount = 10
     
+    //количество всех правильных ответов
+    private var  allcorrectAnswers = 0
+    
     ///фабрика вопросов, которую мы создали. Наш контроллер будет обращаться за вопросами именно к ней.
     private var questionFactory : QuestionFactoryProtocol?
 
     ///текущий вопрос, который видит пользователь.
     private var currentQuestion: QuizQuestion?
     
+    
+    
     override var preferredStatusBarStyle: UIStatusBarStyle {
         .lightContent
     }
+    
+    //
+    private var statisticService : StatisticService = StatisticServiceImplementation()
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -35,18 +43,16 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         questionFactory?.requestNextQuestion()
         imageView.layer.cornerRadius = 20
         
-        
         var documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         let fileName = "top250MoviesIMDB.json"
         documentsURL.appendPathComponent(fileName)
         print(documentsURL)
         if let jsonString = try? String(contentsOf: documentsURL) {
             let top = getTop(from: jsonString)
-            dump(top)
         }
        
    }
-    
+    ///функция, которая переводит json в модель
     func getTop(from jsonString: String) -> Top? {
         guard let data = jsonString.data(using: .utf8) else { //переводим json в двоичный код
             return nil //если json пустой, возвращаем НИЛ так как функция должна что-то возвращать
@@ -69,11 +75,11 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
             return
         }
         currentQuestion = question
-        let viewMdel = convert(model: question)
+        let viewModel = convert(model: question)
         DispatchQueue.main.async { [weak self] in
-            self?.show(quiz: viewMdel)
+            self?.show(quiz: viewModel)
         }
-        show(quiz: viewMdel)
+       // show(quiz: viewModel)
     }
     
     // MARK: - AlertShowDelegate
@@ -144,11 +150,11 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     ///метод ничего не принимает и ничего не возвращает
     private func showNextQuestionOrResult() {
         imageView.layer.borderColor = UIColor.clear.cgColor
-        if currentQuestionIndex == questionsAmount - 1 {
+                if currentQuestionIndex == questionsAmount - 1 {
             //идём в состояние результат Квиза
             let text = correctAnswers == questionsAmount ?
             "Поздравляем, Вы ответили на 10 из 10!" :
-            "Вы ответили на \(correctAnswers) из 10, попробуйте еще раз!"
+                    "Ваш результат: \(correctAnswers)/10\n Количество сыгранных квизов: \(statisticService.gamesCount)\n Рекорд: \(statisticService.bestGame.correct)/\(statisticService.bestGame.total) (\(statisticService.bestGame.date))\n Средняя точность: \(statisticService.totalAccuracy)% "
             let viewModel = QuizResultsViewModel(title: "Этот раунд окончен!",
                                                  text: text,
                                                  buttonText: "Сыграть еще раз")
@@ -183,6 +189,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     /// приватный метод для показа результатов раунда квиза
     /// принимает вью модель QuizResultsViewModel и ничего не возвращает
     private func show(quiz result: QuizResultsViewModel) {
+        statisticService.store(newCorrect: correctAnswers, newTotal: questionsAmount)
         let alertModel = AlertModel(title: result.title, message: result.text, buttonText: result.buttonText) {
             self.correctAnswers = 0
             self.currentQuestionIndex = 0
@@ -196,68 +203,4 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     }
     
 }
-
-/*
- Mock-данные
- 
- 
- Картинка: The Godfather
- Настоящий рейтинг: 9,2
- Вопрос: Рейтинг этого фильма больше чем 6?
- Ответ: ДА
- 
- 
- Картинка: The Dark Knight
- Настоящий рейтинг: 9
- Вопрос: Рейтинг этого фильма больше чем 6?
- Ответ: ДА
- 
- 
- Картинка: Kill Bill
- Настоящий рейтинг: 8,1
- Вопрос: Рейтинг этого фильма больше чем 6?
- Ответ: ДА
- 
- 
- Картинка: The Avengers
- Настоящий рейтинг: 8
- Вопрос: Рейтинг этого фильма больше чем 6?
- Ответ: ДА
- 
- 
- Картинка: Deadpool
- Настоящий рейтинг: 8
- Вопрос: Рейтинг этого фильма больше чем 6?
- Ответ: ДА
- 
- 
- Картинка: The Green Knight
- Настоящий рейтинг: 6,6
- Вопрос: Рейтинг этого фильма больше чем 6?
- Ответ: ДА
- 
- 
- Картинка: Old
- Настоящий рейтинг: 5,8
- Вопрос: Рейтинг этого фильма больше чем 6?
- Ответ: НЕТ
- 
- 
- Картинка: The Ice Age Adventures of Buck Wild
- Настоящий рейтинг: 4,3
- Вопрос: Рейтинг этого фильма больше чем 6?
- Ответ: НЕТ
- 
- 
- Картинка: Tesla
- Настоящий рейтинг: 5,1
- Вопрос: Рейтинг этого фильма больше чем 6?
- Ответ: НЕТ
- 
- 
- Картинка: Vivarium
- Настоящий рейтинг: 5,8
- Вопрос: Рейтинг этого фильма больше чем 6?
- Ответ: НЕТ
- */
 
