@@ -46,7 +46,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         var documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         let fileName = "top250MoviesIMDB.json"
         documentsURL.appendPathComponent(fileName)
-        print(documentsURL)
         if let jsonString = try? String(contentsOf: documentsURL) {
             let top = getTop(from: jsonString)
         }
@@ -79,7 +78,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         DispatchQueue.main.async { [weak self] in
             self?.show(quiz: viewModel)
         }
-       // show(quiz: viewModel)
     }
     
     // MARK: - AlertShowDelegate
@@ -162,16 +160,15 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
         } else {
             //Переходим к следующему вопросу
             currentQuestionIndex += 1
-            self.questionFactory?.requestNextQuestion()
+            questionFactory?.requestNextQuestion()
         }
     }
-    //\(String(format: "%.2f", statisticService.totalAccuracy))%"
-    
     
     /// приватный метод для показа результатов раунда квиза
     /// принимает вью модель QuizResultsViewModel и ничего не возвращает
     private func show(quiz result: QuizResultsViewModel) {
-        let alertModel = AlertModel(title: result.title, message: result.text, buttonText: result.buttonText) {
+        let alertModel = AlertModel(title: result.title, message: result.text, buttonText: result.buttonText) { [weak self] in
+            guard let self = self else {return}
             self.correctAnswers = 0
             self.currentQuestionIndex = 0
 

@@ -10,6 +10,6 @@ import Foundation
 protocol StatisticService {
     func store(newCorrect: Int, newTotal: Int)
     var totalAccuracy: Double { get }
-    var gamesCount: Int { get set }
-    var bestGame: GameRecord { get set }
+    var gamesCount: Int { get }
+    var bestGame: GameRecord { get }
 }

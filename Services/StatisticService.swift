@@ -34,7 +34,7 @@ final class StatisticServiceImplementation: StatisticService {
         
     }
     //количество сыгранных игр
-    var gamesCount: Int {
+    private(set) var gamesCount: Int {
         get {
             let countOfGames = userDefaults.integer(forKey: Keys.gamesCount.rawValue)
             return countOfGames
@@ -45,7 +45,7 @@ final class StatisticServiceImplementation: StatisticService {
     }
     
     //экземпляр структуры (модель лучшей игры)
-    var bestGame: GameRecord {
+    private(set) var bestGame: GameRecord {
         get {
             //достаём значение модели лучшей игры из userDefaults в формате "Дата":
             guard let data = userDefaults.data(forKey: Keys.bestGame.rawValue),

@@ -7,7 +7,7 @@
 
 import UIKit
 
-class AlertPresenter {
+final class AlertPresenter {
     weak var delegate : AlertShowDelegate?
      func getAlert(alertModel: AlertModel) {
         //создаём объекты всплывающего окна
