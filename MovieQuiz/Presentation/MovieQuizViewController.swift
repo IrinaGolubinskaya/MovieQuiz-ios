@@ -150,11 +150,11 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     ///метод ничего не принимает и ничего не возвращает
     private func showNextQuestionOrResult() {
         imageView.layer.borderColor = UIColor.clear.cgColor
-                if currentQuestionIndex == questionsAmount - 1 {
+        if currentQuestionIndex == questionsAmount - 1 {
+            statisticService.store(newCorrect: correctAnswers, newTotal: questionsAmount)
+            let strTotalAccuracy = String(format: "%.2f", statisticService.totalAccuracy)
             //идём в состояние результат Квиза
-            let text = correctAnswers == questionsAmount ?
-            "Поздравляем, Вы ответили на 10 из 10!" :
-                    "Ваш результат: \(correctAnswers)/10\n Количество сыгранных квизов: \(statisticService.gamesCount)\n Рекорд: \(statisticService.bestGame.correct)/\(statisticService.bestGame.total) (\(statisticService.bestGame.date))\n Средняя точность: \(statisticService.totalAccuracy)% "
+            let text = "Ваш результат: \(correctAnswers)/10\n Количество сыгранных квизов: \(statisticService.gamesCount)\n Рекорд: \(statisticService.bestGame.correct)/\(statisticService.bestGame.total) (\(statisticService.bestGame.date.dateTimeString))\n Средняя точность: \(strTotalAccuracy)% "
             let viewModel = QuizResultsViewModel(title: "Этот раунд окончен!",
                                                  text: text,
                                                  buttonText: "Сыграть еще раз")
@@ -165,31 +165,12 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
             self.questionFactory?.requestNextQuestion()
         }
     }
+    //\(String(format: "%.2f", statisticService.totalAccuracy))%"
     
-    private func showAlert() {
-        //создаём объекты всплывающего окна
-        let alert = UIAlertController(title: "Этот раунд окончен!", message: "This is an alert", preferredStyle: .alert)
-        //создаём для алерта кнопку с действием
-        //в замыкании пишем, что должно происходить при нажатии на кнопку
-        let action = UIAlertAction(title: "OK", style: .default) { [weak self] _ in
-            guard let self = self else {return}
-            //выводим на экран все вопросы занаво, начиная с первого:
-            self.currentQuestionIndex = 0
-            //обнуляем счетчик с результатами квиза:
-            self.correctAnswers = 0
-            
-            self.questionFactory?.requestNextQuestion()
-        }
-        alert.addAction (action)
-        
-        //показываем всплывающее окно
-        self.present(alert, animated: true)
-    }
     
     /// приватный метод для показа результатов раунда квиза
     /// принимает вью модель QuizResultsViewModel и ничего не возвращает
     private func show(quiz result: QuizResultsViewModel) {
-        statisticService.store(newCorrect: correctAnswers, newTotal: questionsAmount)
         let alertModel = AlertModel(title: result.title, message: result.text, buttonText: result.buttonText) {
             self.correctAnswers = 0
             self.currentQuestionIndex = 0
