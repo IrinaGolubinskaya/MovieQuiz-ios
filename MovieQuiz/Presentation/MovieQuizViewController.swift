@@ -117,7 +117,12 @@ final class MovieQuizViewController: UIViewController {
             statisticService.store(newCorrect: correctAnswers, newTotal: questionsAmount)
             let strTotalAccuracy = String(format: "%.2f", statisticService.totalAccuracy)
             //идём в состояние результат Квиза
-            let text = "Ваш результат: \(correctAnswers)/10\n Количество сыгранных квизов: \(statisticService.gamesCount)\n Рекорд: \(statisticService.bestGame.correct)/\(statisticService.bestGame.total) (\(statisticService.bestGame.date.dateTimeString))\n Средняя точность: \(strTotalAccuracy)% "
+            let text = """
+Ваш результат: \(correctAnswers)/10
+Количество сыгранных квизов: \(statisticService.gamesCount)
+Рекорд: \(statisticService.bestGame.correct)/\(statisticService.bestGame.total) (\(statisticService.bestGame.date.dateTimeString))
+Средняя точность: \(strTotalAccuracy)%
+"""
             let viewModel = QuizResultsViewModel(title: "Этот раунд окончен!",
                                                  text: text,
                                                  buttonText: "Сыграть еще раз")
