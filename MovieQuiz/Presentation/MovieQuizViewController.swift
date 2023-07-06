@@ -1,12 +1,14 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, AlertShowDelegate {
+final class MovieQuizViewController: UIViewController {
+    
     @IBOutlet weak private var questionLabel: UILabel!
     @IBOutlet weak private var counterLabel: UILabel!
     @IBOutlet weak private var imageView: UIImageView!
     @IBOutlet weak private var textLabel: UILabel!
     @IBOutlet weak private var noButton: UIButton!
     @IBOutlet weak private var yesButton: UIButton!
+    @IBOutlet weak private var activityIndicator: UIActivityIndicatorView!
     
     ///переменная с индексом текущего вопроса, начальное значение 0
     ///(по этому индексу будем искать вопрос в массиве, где индекс первого элемента = 0
@@ -23,66 +25,31 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     
     ///фабрика вопросов, которую мы создали. Наш контроллер будет обращаться за вопросами именно к ней.
     private var questionFactory : QuestionFactoryProtocol?
-
+    
+    ///класс, которы показывает alert-ы, взяв данные из alertModel
+    private let alertPresenter = AlertPresenter()
+    
     ///текущий вопрос, который видит пользователь.
     private var currentQuestion: QuizQuestion?
-    
-    
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
         .lightContent
     }
     
-    //
     private var statisticService : StatisticService = StatisticServiceImplementation()
     
     // MARK: - Lifecycle
+    
+    //Сейчас мы просим там дать следующий вопрос, а должны начинать загрузку данных
     override func viewDidLoad() {
         super.viewDidLoad()
-        questionFactory = QuestionFactory(delegate: self)
-        questionFactory?.requestNextQuestion()
-        imageView.layer.cornerRadius = 20
+        alertPresenter.delegate = self
         
-        var documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        let fileName = "top250MoviesIMDB.json"
-        documentsURL.appendPathComponent(fileName)
-        if let jsonString = try? String(contentsOf: documentsURL) {
-            let top = getTop(from: jsonString)
-        }
-       
-   }
-    ///функция, которая переводит json в модель
-    func getTop(from jsonString: String) -> Top? {
-        guard let data = jsonString.data(using: .utf8) else { //переводим json в двоичный код
-            return nil //если json пустой, возвращаем НИЛ так как функция должна что-то возвращать
-        }
-        do {
-            let top = try JSONDecoder().decode(Top.self, from: data)
-            return top
-        } catch {
-            print("Failed to parse: \(error.localizedDescription)")
-            
-            return nil
-        }
-    }
-    
-    
-    
-    // MARK: - QuestionFactoryDelegate
-    func didReceiveNextQuestion(question: QuizQuestion?) {
-        guard let question = question else {
-            return
-        }
-        currentQuestion = question
-        let viewModel = convert(model: question)
-        DispatchQueue.main.async { [weak self] in
-            self?.show(quiz: viewModel)
-        }
-    }
-    
-    // MARK: - AlertShowDelegate
-    func show(alert: UIAlertController) {
-        present(alert, animated: true)
+        showLoadingIndicator()
+        let moviesLoading = MoviesLoader()
+        questionFactory = QuestionFactory(moviesLoader: moviesLoading, delegate: self)
+        questionFactory?.loadData()
+        imageView.layer.cornerRadius = 20
     }
     
     @IBAction private func noButtonClicked(_ sender: Any) {
@@ -106,8 +73,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     
     /// метод конвертации, который принимает моковый вопрос и возвращает вью модель для экрана вопроса
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
-        let image1 = UIImage(named: model.image) ??  UIImage()
-        
+        let image1 = UIImage(data: model.image) ??  UIImage()
         let questionNumber1 = "\(currentQuestionIndex + 1)/\(questionsAmount)"
         let viewModel = QuizStepViewModel(image: image1,
                                           question: model.text,
@@ -125,7 +91,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     
     /// метод красит рамку, в зависимости от ответа ДА/НЕТ
     /// isCorrect это параметр который указывает верный ответ или нет.  Если true, ответ ВЕРНЫЙ, если false - неверный
-    ///
     private func showAnswerResult(isCorrect: Bool) {
         imageView.layer.masksToBounds = true
         imageView.layer.borderWidth = 8
@@ -168,17 +133,73 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate, 
     /// принимает вью модель QuizResultsViewModel и ничего не возвращает
     private func show(quiz result: QuizResultsViewModel) {
         let alertModel = AlertModel(title: result.title, message: result.text, buttonText: result.buttonText) { [weak self] in
-            guard let self = self else {return}
+            guard let self = self else {
+                
+                return
+            }
             self.correctAnswers = 0
             self.currentQuestionIndex = 0
-
             self.questionFactory?.requestNextQuestion()
         }
-        let alertPresenter = AlertPresenter()
-        alertPresenter.delegate = self
         alertPresenter.getAlert(alertModel: alertModel)
-        
     }
     
+    private func showLoadingIndicator() {
+        activityIndicator.isHidden = false
+        activityIndicator.startAnimating()
+    }
+    
+    private func showNetworkError(message: String) {
+        let model = AlertModel(title: "Ошибка", message: message, buttonText: "Попробовать еще раз") { [weak self] in
+            guard let self = self else {return}
+            
+            self.currentQuestionIndex = 0
+            self.correctAnswers = 0
+            self.questionFactory?.requestNextQuestion()
+        }
+        alertPresenter.getAlert(alertModel: model)
+    }
+    
+    func sendFirstRequest() {
+        // создаём адрес
+        guard let url = URL(string: "https://imdb-api.com/en/API/Top250Movies/k_zcuw1ytf") else { return }
+        // создаём запрос
+        let request = URLRequest(url: url)
+        // Создаём задачу на отправление запроса в сеть
+        let task: URLSessionDataTask = URLSession.shared.dataTask(with: request) { data, response, error in
+            if let _ = error {
+                self.showNetworkError(message: "")
+            }
+        }
+        // Отправляем запрос
+        task.resume()
+    }
 }
 
+// MARK: - QuestionFactoryDelegate
+extension MovieQuizViewController : QuestionFactoryDelegate {
+    func didReceiveNextQuestion(question: QuizQuestion?) {
+        guard let question = question else { return }
+        currentQuestion = question
+        let viewModel = convert(model: question)
+        DispatchQueue.main.async { [weak self] in
+            self?.show(quiz: viewModel)
+        }
+    }
+    
+    func didLoadDataFromServer() {
+        activityIndicator.isHidden = true
+        questionFactory?.requestNextQuestion()
+    }
+    
+    func didFailToLoadData(with error: Error) {
+        showNetworkError(message: error.localizedDescription)
+    }
+}
+
+// MARK: - AlertShowDelegate
+extension MovieQuizViewController: AlertShowDelegate {
+    func show(alert: UIAlertController) {
+        present(alert, animated: true)
+    }
+}

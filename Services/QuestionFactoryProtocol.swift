@@ -6,8 +6,9 @@
 //
 
 import Foundation
-/// протокол, который возвращает вопрос для квиза
+
 protocol QuestionFactoryProtocol {
     ///метод, который возвращает вопрос для квиза
-    func requestNextQuestion() 
+    func requestNextQuestion()
+    func loadData()
 }

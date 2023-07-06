@@ -6,7 +6,9 @@
 //
 
 import Foundation
-///протокол, который принимает вопрос
+
 protocol QuestionFactoryDelegate: AnyObject {
     func didReceiveNextQuestion(question: QuizQuestion?)
+    func didLoadDataFromServer()
+    func didFailToLoadData(with error: Error)
 }

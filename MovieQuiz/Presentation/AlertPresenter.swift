@@ -8,8 +8,10 @@
 import UIKit
 
 final class AlertPresenter {
+    
     weak var delegate : AlertShowDelegate?
-     func getAlert(alertModel: AlertModel) {
+    
+    func getAlert(alertModel: AlertModel) {
         //создаём объекты всплывающего окна
         let alert = UIAlertController(title: alertModel.title, message: alertModel.message, preferredStyle: .alert)
         //создаём для алерта кнопку с действием
@@ -18,7 +20,6 @@ final class AlertPresenter {
             alertModel.completion()
         }
         alert.addAction (action)
-         delegate?.show(alert: alert)
+        delegate?.show(alert: alert)
     }
-    
 }

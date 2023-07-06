@@ -8,15 +8,15 @@
 import Foundation
 
 struct Movie: Codable {
-        let id : String
-        let rank: Int
-        let title: String
-        let fullTitle: String
-        let year: Int
-        let image: String
-        let crew: String
-        let imDbRating : Double
-        let imDbRatingCount: Int
+    let id : String
+    let rank: Int
+    let title: String
+    let fullTitle: String
+    let year: Int
+    let image: String
+    let crew: String
+    let imDbRating : Double
+    let imDbRatingCount: Int
     
     enum CodingKeys : CodingKey {
         case id
@@ -36,6 +36,7 @@ struct Movie: Codable {
         case imDbRatingFailure
         case imDbRatingCount
     }
+    
     init(from decoder: Decoder) throws {
         let container =  try decoder.container(keyedBy: CodingKeys.self)
         
@@ -45,6 +46,7 @@ struct Movie: Codable {
         guard let rankValue = Int(rank) else {
             throw ParseError.rankFailure
         }
+        
         self.rank = rankValue
         
         title = try container.decode(String.self, forKey: .title)
@@ -55,6 +57,7 @@ struct Movie: Codable {
         guard let yeraValue = Int(year) else {
             throw ParseError.yearFailure
         }
+        
         self.year = yeraValue
         
         image = try container.decode(String.self, forKey: .image)
@@ -65,12 +68,14 @@ struct Movie: Codable {
         guard let imDbRatingValue = Double(imDbRating) else {
             throw ParseError.imDbRatingFailure
         }
+        
         self.imDbRating = imDbRatingValue
         
         let imDbRatingCount = try container.decode(String.self, forKey: .imDbRatingCount)
         guard let imDbRatingCountValue = Int(imDbRatingCount) else {
             throw ParseError.imDbRatingFailure
         }
+        
         self.imDbRatingCount = imDbRatingCountValue
     }
 }

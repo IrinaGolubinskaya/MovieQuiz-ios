@@ -2,7 +2,6 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <device id="retina6_72" orientation="portrait" appearance="dark"/>
     <dependencies>
-        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
@@ -114,17 +113,23 @@
                                     </stackView>
                                 </subviews>
                             </stackView>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="OAH-ty-zke">
+                                <rect key="frame" x="205" y="456" width="20" height="20"/>
+                            </activityIndicatorView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" name="YP Black "/>
                         <constraints>
+                            <constraint firstItem="OAH-ty-zke" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="6wT-Jg-n1r"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="noB-CQ-y2H" secondAttribute="bottom" id="7n4-ZX-UKJ"/>
                             <constraint firstItem="noB-CQ-y2H" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="10" id="au0-np-TiD"/>
+                            <constraint firstItem="OAH-ty-zke" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="rJm-Bs-3DF"/>
                             <constraint firstItem="noB-CQ-y2H" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="rda-74-3Ga"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="noB-CQ-y2H" secondAttribute="trailing" constant="20" id="rpA-LJ-mC2"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="activityIndicator" destination="OAH-ty-zke" id="crS-l8-kVK"/>
                         <outlet property="counterLabel" destination="6hv-Ag-5ah" id="vfS-L9-oUD"/>
                         <outlet property="imageView" destination="yIB-L4-dzf" id="fw0-QT-anc"/>
                         <outlet property="noButton" destination="s9w-9O-caq" id="Tg9-d0-xwj"/>

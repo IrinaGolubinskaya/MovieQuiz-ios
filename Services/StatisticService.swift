@@ -49,8 +49,8 @@ final class StatisticServiceImplementation: StatisticService {
         get {
             //достаём значение модели лучшей игры из userDefaults в формате "Дата":
             guard let data = userDefaults.data(forKey: Keys.bestGame.rawValue),
-            // полученное значение модели переводим в модель GameRecord:
-            let record = try? JSONDecoder().decode(GameRecord.self, from: data) else {
+                  // полученное значение модели переводим в модель GameRecord:
+                  let record = try? JSONDecoder().decode(GameRecord.self, from: data) else {
                 //если не получается, то возвращаем экземпляр структуры с нулевыми параметрами и текущей датой:
                 return .init(correct: 0, total: 0, date: Date())
             }
@@ -83,7 +83,6 @@ final class StatisticServiceImplementation: StatisticService {
             bestGame = newRecord
         }
     }
-    
 }
 
 

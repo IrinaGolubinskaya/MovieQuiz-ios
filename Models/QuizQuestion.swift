@@ -7,13 +7,13 @@
 
 import Foundation
 
-    struct QuizQuestion {
-        ///Строка с названием фильма,
-        ///Совпадает с названием картинки афиши фильма в Assets
-        let image: String
-        ///строка с вопросом о рейтинге фильма
-        let text: String
-        ///Булевое значение (true,false), правильный ответ на вопрос
-        let correctAnswer: Bool
-    }
+struct QuizQuestion {
+    ///Строка с названием фильма,
+    ///Совпадает с названием картинки афиши фильма в Assets
+    let image: Data
+    ///строка с вопросом о рейтинге фильма
+    let text: String
+    ///Булевое значение (true,false), правильный ответ на вопрос
+    let correctAnswer: Bool
+}
 
