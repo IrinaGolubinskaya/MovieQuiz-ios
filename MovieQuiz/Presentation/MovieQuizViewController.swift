@@ -1,7 +1,6 @@
 import UIKit
 
 final class MovieQuizViewController: UIViewController {
-    
     @IBOutlet weak private var questionLabel: UILabel!
     @IBOutlet weak private var counterLabel: UILabel!
     @IBOutlet weak private var imageView: UIImageView!
@@ -32,15 +31,12 @@ final class MovieQuizViewController: UIViewController {
     ///текущий вопрос, который видит пользователь.
     private var currentQuestion: QuizQuestion?
     
+    private var statisticService : StatisticService = StatisticServiceImplementation()
+    
     override var preferredStatusBarStyle: UIStatusBarStyle {
         .lightContent
     }
-    
-    private var statisticService : StatisticService = StatisticServiceImplementation()
-    
     // MARK: - Lifecycle
-    
-    //Сейчас мы просим там дать следующий вопрос, а должны начинать загрузку данных
     override func viewDidLoad() {
         super.viewDidLoad()
         alertPresenter.delegate = self
@@ -138,10 +134,7 @@ final class MovieQuizViewController: UIViewController {
     /// принимает вью модель QuizResultsViewModel и ничего не возвращает
     private func show(quiz result: QuizResultsViewModel) {
         let alertModel = AlertModel(title: result.title, message: result.text, buttonText: result.buttonText) { [weak self] in
-            guard let self = self else {
-                
-                return
-            }
+            guard let self = self else { return }
             self.correctAnswers = 0
             self.currentQuestionIndex = 0
             self.questionFactory?.requestNextQuestion()
