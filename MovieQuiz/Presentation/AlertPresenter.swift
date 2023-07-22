@@ -16,10 +16,12 @@ final class AlertPresenter {
         let alert = UIAlertController(title: alertModel.title, message: alertModel.message, preferredStyle: .alert)
         //создаём для алерта кнопку с действием
         //в замыкании пишем, что должно происходить при нажатии на кнопку
+        alert.view.accessibilityIdentifier = "Game Results"
         let action = UIAlertAction(title: alertModel.buttonText, style: .default) { _ in
             alertModel.completion()
         }
         alert.addAction (action)
+        
         delegate?.show(alert: alert)
     }
 }
