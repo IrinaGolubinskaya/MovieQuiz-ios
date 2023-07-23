@@ -22,8 +22,6 @@ final class MovieQuizViewController: UIViewController {
     ///класс, которы показывает alert-ы, взяв данные из alertModel
     private let alertPresenter = AlertPresenter()
     
-    private var currentQuestion: QuizQuestion?
-    
     private var statisticService : StatisticService = StatisticServiceImplementation()
     
     private let presenter = MovieQuizPresenter()
@@ -45,18 +43,16 @@ final class MovieQuizViewController: UIViewController {
     }
     
     @IBAction private func noButtonClicked(_ sender: Any) {
-        presenter.currentQuestion = currentQuestion
         presenter.noButtonClicked()
     }
     
     @IBAction private func yesButtonClicked(_ sender: Any) {
-        presenter.currentQuestion = currentQuestion
         presenter.yesButtonClicked()
     }
    
     ///приватный метод вывода на экран вопроса,
     ///который принимает на вход вью модель вопроса и ничего не возвращает
-    private func show(quiz step: QuizStepViewModel) {
+    func show(quiz step: QuizStepViewModel) {
         imageView.image = step.image
         textLabel.text = step.question
         counterLabel.text = step.questionNumber
@@ -155,12 +151,7 @@ final class MovieQuizViewController: UIViewController {
 extension MovieQuizViewController : QuestionFactoryDelegate {
     
     func didReceiveNextQuestion(question: QuizQuestion?) {
-        guard let question = question else { return }
-        currentQuestion = question
-        let viewModel = presenter.convert(model: question)
-        DispatchQueue.main.async { [weak self] in
-            self?.show(quiz: viewModel)
-        }
+        presenter.didReceiveNextQuestion(question: question)
     }
     
     func didLoadDataFromServer() {
