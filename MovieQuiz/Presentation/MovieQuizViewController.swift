@@ -22,7 +22,6 @@ final class MovieQuizViewController: UIViewController {
     ///класс, которы показывает alert-ы, взяв данные из alertModel
     private let alertPresenter = AlertPresenter()
     
-    ///текущий вопрос, который видит пользователь.
     private var currentQuestion: QuizQuestion?
     
     private var statisticService : StatisticService = StatisticServiceImplementation()
@@ -37,7 +36,7 @@ final class MovieQuizViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         alertPresenter.delegate = self
-        
+        presenter.viewController = self
         showLoadingIndicator()
         let moviesLoading = MoviesLoader()
         questionFactory = QuestionFactory(moviesLoader: moviesLoading, delegate: self)
@@ -56,12 +55,8 @@ final class MovieQuizViewController: UIViewController {
     }
     
     @IBAction private func yesButtonClicked(_ sender: Any) {
-        //достаём текущий вопрос
-        guard let currentQuestion = currentQuestion else { return }
-        let isCorrectAnswer = currentQuestion.correctAnswer == true
-        showAnswerResult(isCorrect: isCorrectAnswer)
-        yesButton.isUserInteractionEnabled = false
-        noButton.isUserInteractionEnabled = false
+        presenter.currentQuestion = currentQuestion
+        presenter.yesButtonClicked()
     }
    
     ///приватный метод вывода на экран вопроса,
@@ -74,7 +69,7 @@ final class MovieQuizViewController: UIViewController {
     
     /// метод красит рамку, в зависимости от ответа ДА/НЕТ
     /// isCorrect это параметр который указывает верный ответ или нет.  Если true, ответ ВЕРНЫЙ, если false - неверный
-    private func showAnswerResult(isCorrect: Bool) {
+    func showAnswerResult(isCorrect: Bool) {
         imageView.layer.masksToBounds = true
         imageView.layer.borderWidth = 8
         //красим рамку в зависимости от того, правильный ответ или нет
