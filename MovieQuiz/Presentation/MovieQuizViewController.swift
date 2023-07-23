@@ -45,13 +45,8 @@ final class MovieQuizViewController: UIViewController {
     }
     
     @IBAction private func noButtonClicked(_ sender: Any) {
-        //достаём текущий вопрос:
-        guard let currentQuestion = currentQuestion else { return }
-        //булевая переменная которая содержит ТРУ если ответ сошелся
-        let isCorrectAnswer = currentQuestion.correctAnswer == false
-        showAnswerResult(isCorrect: isCorrectAnswer)
-        noButton.isUserInteractionEnabled = false
-        yesButton.isUserInteractionEnabled = false
+        presenter.currentQuestion = currentQuestion
+        presenter.noButtonClicked()
     }
     
     @IBAction private func yesButtonClicked(_ sender: Any) {
