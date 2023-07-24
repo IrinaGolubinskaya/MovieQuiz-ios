@@ -14,12 +14,9 @@ final class MovieQuizViewController: UIViewController {
     
     ///класс, которы показывает alert-ы, взяв данные из alertModel
     private let alertPresenter = AlertPresenter()
-    
-    private var statisticService : StatisticService = StatisticServiceImplementation()
-    
+        
     private var presenter: MovieQuizPresenter!
 
-    
     override var preferredStatusBarStyle: UIStatusBarStyle {
         .lightContent
     }
@@ -27,7 +24,7 @@ final class MovieQuizViewController: UIViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        alertPresenter.delegate = self
+      //  alertPresenter.delegate = self
         presenter = MovieQuizPresenter(viewController: self)
         showLoadingIndicator()
         let moviesLoading = MoviesLoader()
@@ -50,59 +47,36 @@ final class MovieQuizViewController: UIViewController {
         counterLabel.text = step.questionNumber
     }
     
-    /// метод красит рамку, в зависимости от ответа ДА/НЕТ
-    /// isCorrect это параметр который указывает верный ответ или нет.  Если true, ответ ВЕРНЫЙ, если false - неверный
-    func showAnswerResult(isCorrect: Bool) {
-        presenter.didAnswer(isCorrectAnswer: isCorrect)
-        imageView.layer.masksToBounds = true
-        imageView.layer.borderWidth = 8
-        //красим рамку в зависимости от того, правильный ответ или нет
-        imageView.layer.borderColor = isCorrect == true ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
-       
-        //запускаем задачу через 1 секунду с помощью диспетчера задач:
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-            guard let self = self else {return}
-            // который мы хотим вызвать через 1 секунду
-            self.presenter.showNextQuestionOrResult()
-        }
-    }
-    
-    ///приватный метод, который содержит логику перехода в один из сценариев
-    ///метод ничего не принимает и ничего не возвращает
-    private func showNextQuestionOrResult() {
-      //  imageView.layer.borderColor = UIColor.clear.cgColor //куда-то определить
-        if presenter.isLastQuestion() {
-            statisticService.store(newCorrect:presenter.correctAnswers, newTotal: presenter.questionsAmount)
-            let strTotalAccuracy = String(format: "%.2f", statisticService.totalAccuracy)
-            //идём в состояние результат Квиза
-            let text = """
-Ваш результат: \(presenter.correctAnswers)/10
-Количество сыгранных квизов: \(statisticService.gamesCount)
-Рекорд: \(statisticService.bestGame.correct)/\(statisticService.bestGame.total) (\(statisticService.bestGame.date.dateTimeString))
-Средняя точность: \(strTotalAccuracy)%
-"""
-            let viewModel = QuizResultsViewModel(title: "Этот раунд окончен!",
-                                                 text: text,
-                                                 buttonText: "Сыграть еще раз")
-            show(quiz: viewModel)
-        } else {
-            //Переходим к следующему вопросу
-            presenter.switchToNextQuestion()
-        }
-    }
-    
     /// приватный метод для показа результатов раунда квиза
     /// принимает вью модель QuizResultsViewModel и ничего не возвращает
     func show(quiz result: QuizResultsViewModel) {
-        let alertModel = AlertModel(title: result.title, message: result.text, buttonText: result.buttonText) { [weak self] in
+        
+        let message = presenter.makeResultsMassage()
+        
+        let alert = UIAlertController(
+            title: result.title,
+            message: message,
+            preferredStyle: .alert)
+        
+        let action = UIAlertAction(title: result.buttonText, style: .default) { [weak self] _ in
             guard let self = self else { return }
+            
             self.presenter.restartGame()
         }
-        alertPresenter.getAlert(alertModel: alertModel)
+        
+        alert.addAction(action)
+        
+        self.present(alert,animated: true)
     }
     
     func hideLoadingIndicator() {
         activityIndicator.isHidden = true
+    }
+    
+    func highlightImageBorder(isCorrectAnswer: Bool) {
+        imageView.layer.masksToBounds = true
+        imageView.layer.borderWidth = 8
+        imageView.layer.borderColor = isCorrectAnswer ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
     }
     
     func showLoadingIndicator() {
@@ -137,8 +111,8 @@ final class MovieQuizViewController: UIViewController {
     }
 }
 // MARK: - AlertShowDelegate
-extension MovieQuizViewController: AlertShowDelegate {
-    func show(alert: UIAlertController) {
-        present(alert, animated: true)
-    }
-}
+//extension MovieQuizViewController: AlertShowDelegate {
+//    func show(alert: UIAlertController) {
+//        present(alert, animated: true)
+//    }
+//}

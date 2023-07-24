@@ -8,12 +8,14 @@
 import UIKit
 
 final class MovieQuizPresenter: QuestionFactoryDelegate {
-    
+    private var statisticService : StatisticService!
     private var questionFactory : QuestionFactoryProtocol?
     weak var viewController: MovieQuizViewController?
     
     init(viewController: MovieQuizViewController) {
         self.viewController = viewController
+        
+        statisticService = StatisticServiceImplementation()
         questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
         questionFactory?.loadData()
         viewController.showLoadingIndicator()
@@ -26,6 +28,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         viewController?.hideLoadingIndicator()
         questionFactory?.requestNextQuestion()
     }
+    
     
     func didFailToLoadData(with error: Error) {
         let message = error.localizedDescription
@@ -65,13 +68,31 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         didAnswer(isYes: false)
     }
     
+    func makeResultsMassage() -> String {
+        statisticService.store(newCorrect: correctAnswers, newTotal: questionsAmount)
+        print(correctAnswers)
+        let bestGame = statisticService.bestGame
+        
+        let totalPlaysCountLine = "Количество сыгранных квизов: \(statisticService.gamesCount)"
+        let currentGameResultLine = "Ваш рeзультат \(correctAnswers)\\\(questionsAmount)"
+        let bestGameInfoLine = "Рекорд: \(bestGame.correct)\\\(bestGame.total)" + "(\(bestGame.date.dateTimeString))"
+        let averageAccuracyLine = "Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%"
+        
+        let resultMessage = [
+            currentGameResultLine, totalPlaysCountLine, bestGameInfoLine, averageAccuracyLine].joined(separator: "\n")
+        
+        return resultMessage
+    }
+    
     private func didAnswer(isYes: Bool) {
         guard let currentQuestion = currentQuestion else { return }
         let givenAnswer = isYes
-        viewController?.showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+        proceedWithAnswer(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
     func didAnswer(isCorrectAnswer: Bool) {
-        correctAnswers += 1
+        if isCorrectAnswer {
+            correctAnswers += 1
+        }
     }
     func didReceiveNextQuestion(question: QuizQuestion?) {
         guard let question = question else { return }
@@ -83,7 +104,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         }
     }
     
-    func showNextQuestionOrResult() {
+    func proceedToNextQuestionOrResults() {
         if self.isLastQuestion() {
             let text = "Вы ответили на \(correctAnswers) из 10, попробуйте ещё раз!" 
             
@@ -97,7 +118,17 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
             questionFactory?.requestNextQuestion() 
         }
     }
+    
+    func proceedWithAnswer(isCorrect: Bool) {
+        didAnswer(isCorrectAnswer: isCorrect)
+     
+        viewController?.highlightImageBorder(isCorrectAnswer: isCorrect)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            guard let self = self else {return}
+            // который мы хотим вызвать через 1 секунду
+            self.proceedToNextQuestionOrResults()
+        }
+    }
 }
-
-
 
