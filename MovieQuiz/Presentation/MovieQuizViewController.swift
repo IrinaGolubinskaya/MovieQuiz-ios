@@ -72,16 +72,16 @@ final class MovieQuizViewController: UIViewController {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else {return}
             // который мы хотим вызвать через 1 секунду
-            self.showNextQuestionOrResult()
-            self.noButton.isUserInteractionEnabled = true
-            self.yesButton.isUserInteractionEnabled = true
+            self.presenter.correctAnswers = self.correctAnswers
+            self.presenter.questionFactory = self.questionFactory
+            self.presenter.showNextQuestionOrResult()
         }
     }
     
     ///приватный метод, который содержит логику перехода в один из сценариев
     ///метод ничего не принимает и ничего не возвращает
     private func showNextQuestionOrResult() {
-        imageView.layer.borderColor = UIColor.clear.cgColor
+      //  imageView.layer.borderColor = UIColor.clear.cgColor //куда-то определить
         if presenter.isLastQuestion() {
             statisticService.store(newCorrect: correctAnswers, newTotal: presenter.questionsAmount)
             let strTotalAccuracy = String(format: "%.2f", statisticService.totalAccuracy)
@@ -105,7 +105,7 @@ final class MovieQuizViewController: UIViewController {
     
     /// приватный метод для показа результатов раунда квиза
     /// принимает вью модель QuizResultsViewModel и ничего не возвращает
-    private func show(quiz result: QuizResultsViewModel) {
+    func show(quiz result: QuizResultsViewModel) {
         let alertModel = AlertModel(title: result.title, message: result.text, buttonText: result.buttonText) { [weak self] in
             guard let self = self else { return }
             self.correctAnswers = 0
