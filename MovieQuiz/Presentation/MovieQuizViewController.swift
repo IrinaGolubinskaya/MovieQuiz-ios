@@ -28,7 +28,7 @@ final class MovieQuizViewController: UIViewController {
         presenter = MovieQuizPresenter(viewController: self)
         showLoadingIndicator()
         let moviesLoading = MoviesLoader()
-            imageView.layer.cornerRadius = 20
+        imageView.layer.cornerRadius = 20
     }
     
     @IBAction private func noButtonClicked(_ sender: Any) {
@@ -77,6 +77,11 @@ final class MovieQuizViewController: UIViewController {
         imageView.layer.masksToBounds = true
         imageView.layer.borderWidth = 8
         imageView.layer.borderColor = isCorrectAnswer ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            guard let self = self else { return }
+            self.imageView.layer.borderColor = UIColor.clear.cgColor
+        }
     }
     
     func showLoadingIndicator() {
