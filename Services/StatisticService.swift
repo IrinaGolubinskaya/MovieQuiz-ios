@@ -19,6 +19,7 @@ final class StatisticServiceImplementation: StatisticService {
     private var total: Int {
         return userDefaults.integer(forKey: Keys.total.rawValue)
     }
+    
     ///переменная с количеством ВСЕХ правильных ответов
     private var correct: Int {
         return userDefaults.integer(forKey: Keys.correct.rawValue)
@@ -31,9 +32,8 @@ final class StatisticServiceImplementation: StatisticService {
             let allCorrectAnswers = Double(userDefaults.integer(forKey: Keys.correct.rawValue))
             return 100 * (allCorrectAnswers / allAnswers)
         }
-        
     }
-    //количество сыгранных игр
+    
     private(set) var gamesCount: Int {
         get {
             let countOfGames = userDefaults.integer(forKey: Keys.gamesCount.rawValue)
@@ -44,7 +44,6 @@ final class StatisticServiceImplementation: StatisticService {
         }
     }
     
-    //экземпляр структуры (модель лучшей игры)
     private(set) var bestGame: GameRecord {
         get {
             //достаём значение модели лучшей игры из userDefaults в формате "Дата":
@@ -60,7 +59,6 @@ final class StatisticServiceImplementation: StatisticService {
         set {
             //новое значение record переводим в формат Дата:
             guard let data = try? JSONEncoder().encode(newValue) else {
-                //иначе печатаем сообщение в консоль и выходим из функции
                 print("Невозможно сохранит результат")
                 return
             }
@@ -84,7 +82,3 @@ final class StatisticServiceImplementation: StatisticService {
         }
     }
 }
-
-
-
-

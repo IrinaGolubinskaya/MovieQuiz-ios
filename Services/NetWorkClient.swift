@@ -7,18 +7,12 @@
 
 import Foundation
 
-struct NetWorkClient {
-    
-    private enum NetWorkEnum: Error {
-        case codeError
-    }
-    
-    public enum Result <Success, Failure> where Failure : Error {
-        case success(Success)
-        case failure(Failure)
-    }
-    
-    func fetch(url: URL, handler: @escaping (Result<Data, Error>) -> Void ) {
+protocol NetWorkRouting {
+    func fetch(url:URL, handler: @escaping (Result<Data, Error>)-> Void)
+}
+
+struct NetWorkClient: NetWorkRouting {
+    func fetch(url: URL, handler: @escaping (Result<Data, Error>) -> Void) {
         let request = URLRequest(url: url)
         
         let task = URLSession.shared.dataTask(with: request) { data, response, error  in
@@ -38,4 +32,13 @@ struct NetWorkClient {
         }
         task.resume()
     }
+}
+
+private enum NetWorkEnum: Error {
+    case codeError
+}
+
+public enum Result <Success, Failure> where Failure : Error {
+    case success(Success)
+    case failure(Failure)
 }
