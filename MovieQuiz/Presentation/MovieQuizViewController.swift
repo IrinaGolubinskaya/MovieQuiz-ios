@@ -1,6 +1,6 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController {
+final class MovieQuizViewController: UIViewController, MovieQuizViewControllerProtocol {
     @IBOutlet weak private var questionLabel: UILabel!
     @IBOutlet weak private var counterLabel: UILabel!
     @IBOutlet weak private var imageView: UIImageView!
@@ -26,10 +26,12 @@ final class MovieQuizViewController: UIViewController {
     
     @IBAction private func noButtonClicked(_ sender: Any) {
         presenter.noButtonClicked()
+        didButtonsEnabled(enabled: false)
     }
     
     @IBAction private func yesButtonClicked(_ sender: Any) {
         presenter.yesButtonClicked()
+        didButtonsEnabled(enabled: false)
     }
     
     
@@ -52,6 +54,7 @@ final class MovieQuizViewController: UIViewController {
             title: result.title,
             message: message,
             preferredStyle: .alert)
+            alert.view.accessibilityIdentifier = "Game Results"
         
         let action = UIAlertAction(title: result.buttonText, style: .default) { [weak self] _ in
             guard let self = self else { return }
@@ -88,11 +91,17 @@ final class MovieQuizViewController: UIViewController {
                 guard let self = self else { return }
                 self.presenter.restartGame()
             }
+        
         alert.addAction(action)
     }
     
     func showLoadingIndicator() {
         activityIndicator.isHidden = false
         activityIndicator.startAnimating()
+    }
+    
+    func didButtonsEnabled(enabled: Bool) {
+        noButton.isUserInteractionEnabled = enabled
+        yesButton.isUserInteractionEnabled = enabled
     }
 }

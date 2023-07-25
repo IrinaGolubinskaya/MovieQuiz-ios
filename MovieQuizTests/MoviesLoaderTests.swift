@@ -45,6 +45,7 @@ class MoviesLoaderTest : XCTestCase {
             switch result {
             case .failure(let error):
                 XCTAssertNotNil(error)
+                expectation.fulfill()
             case .success(_):
                 XCTFail("Unexpected failure")
             }
@@ -52,7 +53,6 @@ class MoviesLoaderTest : XCTestCase {
       waitForExpectations(timeout: 1)
     }
 }
-
 
 struct StubNetWorkClient: NetWorkRouting {
     
@@ -69,6 +69,7 @@ struct StubNetWorkClient: NetWorkRouting {
             handler(.success(expectedResponce))
         }
     }
+    
     private var expectedResponce: Data {
         """
   {
@@ -101,7 +102,5 @@ struct StubNetWorkClient: NetWorkRouting {
             ]
           }
 """.data(using: .utf8) ?? Data()
-        
     }
-    
 }

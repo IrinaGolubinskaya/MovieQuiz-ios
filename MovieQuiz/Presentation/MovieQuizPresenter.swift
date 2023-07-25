@@ -10,14 +10,14 @@ import UIKit
 final class MovieQuizPresenter: QuestionFactoryDelegate {
     private var statisticService : StatisticService!
     private var questionFactory : QuestionFactoryProtocol?
-    weak var viewController: MovieQuizViewController?
+    weak var viewController: MovieQuizViewControllerProtocol?
     
     var currentQuestion: QuizQuestion?
     let questionsAmount: Int = 10
     private var currentQuestionIndex: Int = 0
     var correctAnswers = 0
     
-    init(viewController: MovieQuizViewController) {
+    init(viewController: MovieQuizViewControllerProtocol) {
         self.viewController = viewController
         
         statisticService = StatisticServiceImplementation()
@@ -102,7 +102,8 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
             viewController?.show(quiz: viewModel)
         } else {
             self.switchToNextQuestion()
-            questionFactory?.requestNextQuestion() 
+            questionFactory?.requestNextQuestion()
+            viewController?.didButtonsEnabled(enabled: true)
         }
     }
     
@@ -129,7 +130,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         viewController?.highlightImageBorder(isCorrectAnswer: isCorrect)
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-            guard let self = self else {return}
+            guard let self = self else { return }
             // который мы хотим вызвать через 1 секунду
             self.proceedToNextQuestionOrResults()
         }
