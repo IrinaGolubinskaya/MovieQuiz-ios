@@ -8,7 +8,7 @@
 import XCTest
 
 final class MovieQuizUITests: XCTestCase {
-
+    
     var app: XCUIApplication!
     
     override func setUpWithError() throws {
@@ -16,10 +16,10 @@ final class MovieQuizUITests: XCTestCase {
         
         app = XCUIApplication()
         app.launch()
-    
+        
         continueAfterFailure = false
     }
-
+    
     override func tearDownWithError() throws {
         try super.tearDownWithError()
         
@@ -27,21 +27,20 @@ final class MovieQuizUITests: XCTestCase {
         app = nil
         //  Этот метод вызывается после вызова каждого тестового метода в классе.
     }
-
+    
     func testExample() throws {
         // Тесты пользовательского интерфейса должны запускать приложение, которое они тестируют.
         let app = XCUIApplication()
         app.launch()
-
-        // Используйте XCTAssert и связанные с ним функции, чтобы убедиться, что ваши тесты дают правильные результаты.
     }
+    
     func testYesButton() {
         sleep(3)
         
         let firstPoster = app.images["Poster"]
         let firstPosterData = firstPoster.screenshot().pngRepresentation
         
-       app.buttons["Yes"].tap()
+        app.buttons["Yes"].tap()
         sleep(3)
         
         let secondPoster = app.images["Poster"]
@@ -51,7 +50,6 @@ final class MovieQuizUITests: XCTestCase {
         
         XCTAssertNotEqual(firstPosterData, secondPosterData)
         XCTAssertEqual(indexLabel.label, "2/10")
-        
     }
     
     func testNoButton() {
@@ -96,7 +94,6 @@ final class MovieQuizUITests: XCTestCase {
         
         let alert = app.alerts["Game Results"]
         alert.buttons.firstMatch.tap()
-        
         sleep(2)
         
         let indexLabel = app.staticTexts["Index"]

@@ -24,7 +24,7 @@ class ArrayTests: XCTestCase {
     func testGetValueOutOfRange() throws {
         //Given
         let array = [1,2,3,4,5]
-
+        
         //When
         let value = array[safe:20]
         //Then

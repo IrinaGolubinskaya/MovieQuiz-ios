@@ -34,7 +34,6 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
         didButtonsEnabled(enabled: false)
     }
     
-    
     // MARK: - Private functions
     
     ///приватный метод вывода на экран вопроса,
@@ -54,7 +53,7 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
             title: result.title,
             message: message,
             preferredStyle: .alert)
-            alert.view.accessibilityIdentifier = "Game Results"
+        alert.view.accessibilityIdentifier = "Game Results"
         
         let action = UIAlertAction(title: result.buttonText, style: .default) { [weak self] _ in
             guard let self = self else { return }
